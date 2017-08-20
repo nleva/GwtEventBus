@@ -38,7 +38,6 @@ public class Bus {
 		
 		@Override
 		public List<Event> get(Object key) {
-			// TODO Auto-generated method stub
 			List<Event> list = super.get(key);
 			return list==null?new ArrayList<Bus.Event>():list;
 		}
@@ -55,9 +54,7 @@ public class Bus {
 			put(key, list);
 		}
 		
-		public <A,R> List<R> 
-						fire
-						(A o){
+		public <A,R> List<R>  fire (A o){
 			Class<A> clz = (Class<A>) o.getClass();
 			
 			List tmp =  get(clz);
@@ -73,8 +70,9 @@ public class Bus {
 	
 	//Map for events
 	private EventMap map = new EventMap();
-	//instance of a singleton
+	//instance of a primary bus
 	static private Bus bus;
+	//map of buss
 	static private Map<String,Bus> busMap = new HashMap<>();
 	private Bus() {
 	}
@@ -122,7 +120,7 @@ public class Bus {
 	 * Get bus instance by class name
 	 * @return event bus
 	 */
-	static public Bus get(Class busName){
+	static public Bus get(Class<?> busName){
 		Bus bus = busMap.get(busName);
 		if(bus==null) {
 			bus=new Bus();

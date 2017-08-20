@@ -6,17 +6,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import elemental.html.Console;
+import ru.sendto.gwt.client.html.Log;
+
 /**
  * Event bus
  * @author Lev Nadeinsky
- * @date	2017-04-29
  */
 public class Bus {
 
 	/**
 	 * Event
 	 * @author Lev Nadeinsky
-	 * @date	2017-05-01
 	 */
 	public static interface Event<A,R>{
 		R invoke (A a);
@@ -24,7 +25,6 @@ public class Bus {
 	/**
 	 * Event without return value
 	 * @author Lev Nadeinsky
-	 * @date	2017-05-01
 	 */
 	public static interface VoidEvent<A>{
 		void invoke (A a);
@@ -32,7 +32,6 @@ public class Bus {
 	/**
 	 * Hashmap for event binding
 	 * @author Lev Nadeinsky
-	 * @date	2017-05-01
 	 */
 	static class EventMap extends HashMap<Class, List<Event>>{
 		
@@ -55,10 +54,16 @@ public class Bus {
 		}
 		
 		public <A,R> List<R>  fire (A o){
+			
+			Log.console("buss count "+busMap.size());
+			
 			Class<A> clz = (Class<A>) o.getClass();
 			
 			List tmp =  get(clz);
 			List<Event<A,R>> list =tmp;
+			
+			Log.console("listeners list size "+list.size());
+			
 			Object[] results = new Object[list.size()];
 			for (int i=0 ; i< list.size(); i++){//Event<A, R> event : list) {
 				results[i]=list.get(0).invoke(o);
@@ -80,6 +85,8 @@ public class Bus {
 	 * Add listener
 	 * @param key - object class
 	 * @param value - event listener
+	 * @param <A> - event listener
+	 * @param <R> - event listener
 	 */
 	public <A,R> void listen(Class<A> key, Event<A,R> value) {
 		map.listen(key, value);
@@ -88,6 +95,7 @@ public class Bus {
 	 * Add void listener
 	 * @param key - object class
 	 * @param value - event listener
+	 * @param <A> - event listener
 	 */
 	public <A> void listen(Class<A> key, VoidEvent<A> value) {
 		map.listen(key, value);
@@ -106,9 +114,13 @@ public class Bus {
 	}
 	/**
 	 * Get bus instance by name
+	 * @param busName bus name
 	 * @return event bus
 	 */
 	static public Bus get(String busName){
+		if(busName==null)
+			return get();
+		
 		Bus bus = busMap.get(busName);
 		if(bus==null) {
 			bus=new Bus();
@@ -118,27 +130,25 @@ public class Bus {
 	}
 	/**
 	 * Get bus instance by class name
+	 * @param busName bus name
 	 * @return event bus
 	 */
 	static public Bus get(Class<?> busName){
-		Bus bus = busMap.get(busName);
-		if(bus==null) {
-			bus=new Bus();
-			busMap.put(busName.getName(), bus);
-		}
-		return bus;
+		if(busName==null)
+			return get();
+		
+		return get(busName.getName());
 	}
 	/**
 	 * Get bus instance by object class name
+	 * @param busName bus name
 	 * @return event bus
 	 */
 	static public Bus get(Object busName){
-		Bus bus = busMap.get(busName);
-		if(bus==null) {
-			bus=new Bus();
-			busMap.put(busName.getClass().getName(), bus);
-		}
-		return bus;
+		if(busName==null)
+			return get();
+			
+		return get(busName.getClass());
 	}
 	
 }

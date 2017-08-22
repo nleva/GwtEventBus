@@ -6,9 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import elemental.html.Console;
-import ru.sendto.gwt.client.html.Log;
-
 /**
  * Event bus
  * @author Lev Nadeinsky
@@ -26,14 +23,15 @@ public class Bus {
 	 * Event without return value
 	 * @author Lev Nadeinsky
 	 */
-	public static interface VoidEvent<A>{
-		void invoke (A a);
+	public static interface VoidEvent<A> extends Event<A, Void>{
 	}
 	/**
 	 * Hashmap for event binding
 	 * @author Lev Nadeinsky
 	 */
 	static class EventMap extends HashMap<Class, List<Event>>{
+		
+		HashMap<Event,List<List<Event>>> reverseMap = new HashMap<>();
 		
 		@Override
 		public List<Event> get(Object key) {
@@ -45,13 +43,23 @@ public class Bus {
 			List<Event> list = get(key);
 			list.add(value);
 			put(key, list);
+			List<List<Event>> lists = reverseMap.get(value);
+			if(lists==null) {
+				lists=new ArrayList<>();
+				reverseMap.put(value, lists);
+			}
+			lists.add(list);
+		}
+
+		
+		public <A,R> void remove(Event<A,R> value) {
+			final List<List<Event>> lists = reverseMap.get(value);
+			if(lists==null)
+				return;
+			lists.forEach(list->list.remove(value));
 		}
 		
-		public <A> void wire(Class<A> key, VoidEvent<A> value) {
-			List<Event> list = get(key);
-			list.add(t->{value.invoke((A)t);return null;});
-			put(key, list);
-		}
+		
 		
 		public <A,R> List<R>  fire (A o){
 
@@ -95,6 +103,11 @@ public class Bus {
 	public <A> void listen(Class<A> key, VoidEvent<A> value) {
 		map.wire(key, value);
 	}
+	
+	public <A,R> void removeAllListeners(Event<A,R> value) {
+		map.remove(value);
+	}
+	
 	public <A,R> List<R> fire (A o){
 		return map.fire(o);
 	}

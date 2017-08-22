@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module>
 	<inherits name="com.google.gwt.user.User" />
+<<<<<<< HEAD
 	<inherits name="ru.sendto.gwt.Html" />
+=======
+>>>>>>> branch 'master' of https://github.com/nleva/GwtEventBus.git
 	<source path="util" />
 </module>

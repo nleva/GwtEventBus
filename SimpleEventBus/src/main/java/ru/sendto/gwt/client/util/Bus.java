@@ -24,6 +24,13 @@ public class Bus {
 	 * @author Lev Nadeinsky
 	 */
 	public static interface VoidEvent<A> extends Event<A, Void>{
+		@Override
+		default Void invoke (A a) {
+			invokeVoid(a);
+			return null;
+		};
+
+		void invokeVoid (A a);
 	}
 	/**
 	 * Hashmap for event binding

@@ -110,9 +110,17 @@ public class Bus {
 	public <A> void listen(Class<A> key, VoidEvent<A> value) {
 		map.wire(key, value);
 	}
-	
+
 	public <A,R> void removeAllListeners(Event<A,R> value) {
 		map.remove(value);
+	}
+
+	public <A> List<Event> removeAllListeners(Class<A> key) {
+		return map.remove(key);
+	}
+	
+	public void removeAllListeners() {
+		map.clear();
 	}
 	
 	public <A,R> List<R> fire (A o){
